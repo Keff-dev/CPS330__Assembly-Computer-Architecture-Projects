@@ -1,0 +1,42 @@
+; // c0404.c
+      .start main             ; #include <stdio.h>
+
+
+f:    push lr                 ; void f(int x) 
+      push fp
+      mov fp, sp
+
+      ldr r0, fp, 2           ;     printf("%d\n", x);
+      ldr r1, fp, 2
+      brlt ls
+
+ls:   dout r0                 ;           printf("%d\n", x);
+      nl        
+      sub r0, r0, 1
+      str r0, fp 2
+      cmp r0, 0               ;            if (x > 0)
+      brz gt
+      br ls
+
+gt:   ldr r0, fp, 2 
+      add r0, r0, 1
+      dout r0                 ;           printf("%d\n", x);
+      nl
+      str r0, fp 2
+      cmp r0, r1 
+      brz *+2
+      brnz gt
+      
+      nl        
+      mov sp, fp
+      pop fp
+      pop lr                              
+      ret                     ;  }
+
+main: mov r0, 3               ; int main() { 
+      push r0
+      bl f                    ;     f(3);
+      halt                    ;     return 0; } 
+
+
+

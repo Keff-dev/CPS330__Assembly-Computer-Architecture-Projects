@@ -1,0 +1,48 @@
+   .start main                  ; //c1003.c
+   halt                        ; #include <stdio.h>
+a: .zero 5                      ; int a[5];
+@s0_c: .zero 5
+f: push lr                      ; void f()
+   push fp                      ; {
+   mov fp, sp
+   
+   sub sp, sp, 5                   ; int b[5]; ; static int c[5];
+   
+   mov r0, 1                       ; a[0] = 1;
+   st r0, a  
+   
+   mov r0, 3                       ; b[1] = 3; @fp-4  {-5+1}
+   str r0, fp -4
+   
+   mov r0, 22                      ; c[3] = 22;
+   st r0, @s0_c+3
+   
+   mov r0, 12                      ; c[b[a[0]]] = 12; // problem child
+   ld r1, a ; == 1
+   cea r2, -5
+   add r1, r1, r2
+   ldr r1, r1, 0 ; == 3
+   lea r2, @s0_c
+   add r1, r1, r2
+   str r0, r1, 0 ; c[3] = 12
+   
+   ld r0, @s0_c+3                ; printf("%d\n", c[3]);
+   dout r0
+   nl
+   
+   mov sp, fp
+   pop fp
+   pop lr
+   ret                          ; }
+main:                           ; int main()
+   push lr                      ; {
+   push fp
+   mov fp, sp
+
+   bl f                            ; f();
+
+   mov r0, 0                       ; return 0;
+   mov sp, fp                   ; }
+   pop fp
+   pop lr
+   ret

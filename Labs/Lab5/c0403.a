@@ -1,0 +1,37 @@
+; // c0403.c
+      .start main             ; #include <stdio.h>
+
+f:    push lr                 ; void f(int x, int y, int z)
+      push fp
+      mov fp, sp
+      ldr r0, fp, 2           ;     printf("%d %d %d\n", x, y, z);
+      dout r0
+      lea r1, sp
+      sout r1
+      ldr r0, fp, 3
+      dout r0
+      lea r1, sp
+      sout r1
+      ldr r0, fp, 4
+      dout r0
+      lea r1, sp
+      sout r1
+      nl        
+      mov sp, fp
+      pop fp
+      pop lr                              
+      ret                     ;  }
+sp: .string " "
+
+main: mov r0, 3               ; int main() { 
+      push r0
+      mov r0, 2
+      push r0
+      mov r0, 1
+      push r0
+      bl f                    ;     f(1, 2, 3);
+      add sp, sp, 3         ;  not sure if I need to fix the stack since I popped all the numbers...
+      lea r0, msg2            ;     printf("goodbye\n");
+      sout
+      halt                    ;     return 0; } 
+msg2:    .string "goodbye\n"

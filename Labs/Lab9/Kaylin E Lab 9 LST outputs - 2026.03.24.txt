@@ -1,0 +1,513 @@
+++++++++++++++++++++++++++ c0902 ++++++++++++++++++++++++++
+
+LCC Assemble/Link/Interpret/Debug Ver 6.3  Tue Mar 24 10:58:05 2026
+Effendi, Kayin C
+
+Header
+o
+S     0014
+A     0029
+C
+
+Loc   Code           Source Code
+                                           ; // c0902.c
+              .start main                  ; #include <stdio.h>
+0000  f000    halt                         ; #include <stdlib.h>
+0001  0000 A: .zero 2                      ; struct A 
+0002  0000
+                                           ; {
+                                              ; int x;  @a0
+                                              ; char c; @a0
+                                           ; };
+0003  0000 p: .word 0                      ; struct A *p;
+0004  ae00 f: push lr                      ; void f()
+0005  aa00    push fp                      ; {
+0006  ab8c    mov fp, sp
+
+0007  d202    mov r1, 2                      ; p = (struct A *)mall
+0008  481c    bl malloc
+0009  31f9    st r0, p
+
+000a  d001    mov r0, 1                       ; p->x = 1;
+000b  23f7    ld r1, p
+000c  7040    str r0, r1, 0
+
+000d  d041    mov r0, 65                      ; p->c = 'A';
+000e  23f4    ld r1, p
+000f  7041    str r0, r1, 1
+
+0010  ad4c    mov sp, fp                   ; }
+0011  aa01    pop fp
+0012  ae01    pop lr
+0013  c1c0    ret
+0014  ae00 main: push lr                   ; int main()
+0015  aa00       push fp                   ; {
+0016  ab8c       mov fp, sp
+
+0017  4fec       bl f                          ; f();
+
+0018  21ea       ld r0, p                     ; printf("%d\n", p->x
+0019  6000       ldr r0, r0, 0
+001a  f002       dout r0
+001b  f001       nl
+
+001c  21e6       ld r0, p                     ; printf("%c\n", p->c
+001d  6001       ldr r0, r0, 1
+001e  f005       aout r0
+001f  f001       nl
+
+0020  d000       mov r0, 0                    ; return 0;
+0021  ad4c       mov sp, fp            ; }
+0022  aa01       pop fp
+0023  ae01       pop lr
+0024  c1c0       ret
+0025  2003 malloc:  ld r0, @avail
+0026  1201          add r1, r0, r1
+0027  3201          st r1, @avail
+0028  c1c0          ret
+0029  002a @avail:  .word *+1
+====================================================== Output
+1
+A
+
+========================================== Program statistics
+Input file name       =      c0902.a
+Instructions executed =   26 (hex)    38 (dec)
+Program size          =   2a (hex)    42 (dec)
+Max stack size        =    4 (hex)     4 (dec)
+Load point            =    0 (hex)     0 (dec)
+
+
+++++++++++++++++++++++++++ c0903 ++++++++++++++++++++++++++
+
+LCC Assemble/Link/Interpret/Debug Ver 6.3  Tue Mar 24 11:28:17 2026
+Effendi, Kayin C
+
+Header
+o
+S     0017
+C
+
+Loc   Code           Source Code
+              .start main                  ; // c0903.c
+0000  f000    halt                         ; #include <stdio.h>
+0001  0000 A: .zero 2                      ; struct A 
+0002  0000
+                                           ; {
+                                              ; int x, y;
+                                           ; };
+                                           ; struct A s;
+0003  ae00 f: push lr                      ; void f(struct A a, str
+0004  aa00    push fp                      ; {
+0005  ab8c    mov fp, sp
+
+0006  6144    ldr r0, fp, 4                   ; p->x = a.y;
+0007  6342    ldr r1, fp, 2                   ; p->x means de-ref b
+0008  7041    str r0, r1, 1
+
+0009  6142    ldr r0, fp, 2                   ; a.y = p->x;
+000a  6000    ldr r0, r0, 0
+000b  7144    str r0, fp, 4
+
+000c  6143    ldr r0, fp, 3                   ; printf("%d\n", a.x)
+000d  f002    dout r0
+000e  f001    nl
+
+000f  6142    ldr r0, fp, 2                   ; printf("%d\n", (*p)
+0010  6001    ldr r0, r0, 1
+0011  f002    dout r0
+0012  f001    nl
+
+0013  ad4c    mov sp, fp
+0014  aa01    pop fp
+0015  ae01    pop lr
+0016  c1c0    ret                          ; }
+
+0017  ae00 main: push lr                   ; int main()
+0018  aa00       push fp                   ; {
+0019  ab8c       mov fp, sp
+                                              ; struct A a;
+
+001a  d001       mov r0, 1                    ; a.x = 1;
+001b  31e5       st r0, A
+
+001c  d002       mov r0, 2                    ; a.y = 2;
+001d  31e4       st r0, A+1
+
+001e  21e3       ld r0, A+1                   ; f(a, &a);
+001f  a000       push r0
+0020  21e0       ld r0, A 
+0021  a000       push r0
+0022  e1de       lea r0, A
+0023  a000       push r0
+0024  4fde       bl f 
+0025  1da3       add sp, sp, 3
+
+0026  d000       mov r0, 0                    ; return 0;
+0027  ad4c       mov sp, fp
+0028  aa01       pop fp
+0029  ae01       pop lr
+002a  c1c0       ret                       ; }
+====================================================== Output
+1
+2
+
+========================================== Program statistics
+Input file name       =      c0903.a
+Instructions executed =   29 (hex)    41 (dec)
+Program size          =   2b (hex)    43 (dec)
+Max stack size        =    7 (hex)     7 (dec)
+Load point            =    0 (hex)     0 (dec)
+
+
+++++++++++++++++++++++++++ c0904 ++++++++++++++++++++++++++
+
+
+LCC.js Assemble/Link/Interpret/Debug Ver 0.1  Tue, Mar 24, 2026, 11:56:09
+Effendi, Kayin C
+
+Header
+o
+A 0003
+S 0023
+C
+
+Loc   Code
+                       .start main                  ; // c0904.c
+0000  f000          halt                         ; #include <stdio.h>
+0001  0000       B: .zero 1                      ; struct B
+                                                    ; {
+                                                       ; char c;
+                                                    ; };
+0002  0000       A: .zero 1                     ; struct A 
+0003  0001          .word B                      ; {
+                                                       ; int x;
+                                                       ; struct B y;
+                                                    ; };
+                                                    ; struct A s;
+0004  ae00       f: push lr                      ; void f()
+0005  aa00          push fp                      ; {
+0006  ab8c          mov fp, sp
+                       
+0007  bda1          sub sp, sp, 1                   ; struct A *p;
+                          
+0008  e1f9          lea r0, A                       ; p = &s; @ fp-1
+0009  717f          str r0, fp, -1
+                          
+000a  d001          mov r0, 1                       ; s.x = 1;
+000b  637f          ldr r1, fp, -1
+000c  7040          str r0, r1, 0
+                          
+000d  d041          mov r0, 'A'                     ; s.y.c = 'A';
+000e  637f          ldr r1, fp, -1
+000f  6241          ldr r1, r1, 1
+0010  7040          str r0, r1, 0
+                          
+0011  617f          ldr r0, fp, -1                  ; printf("%d\n", p->x);
+0012  6000          ldr r0, r0, 0
+0013  f002          dout r0
+0014  f001          nl
+                    
+0015  617f          ldr r0, fp, -1                 ; printf("%c\n", (p->y).c);
+0016  6001          ldr r0, r0, 1
+0017  6000          ldr r0, r0, 0
+0018  f005          aout r0
+0019  f001          nl
+                          
+001a  617f          ldr r0, fp, -1                  ; printf("%c\n", (*p).y.c);
+001b  6001          ldr r0, r0, 1
+001c  6000          ldr r0, r0, 0
+001d  f005          aout r0
+001e  f001          nl
+                    
+001f  ad4c          mov sp, fp
+0020  aa01          pop fp
+0021  ae01          pop lr
+0022  c1c0          ret                          ; }
+                    main:                           ; int main()
+0023  ae00          push lr                     ; {
+0024  aa00          push fp
+0025  ab8c          mov fp, sp
+                       
+0026  4fdd          bl f                            ; f();
+                       
+0027  d000          mov r0, 0                       ; return 0;
+                       
+0028  ad4c          mov sp, fp
+0029  aa01          pop fp
+002a  ae01          pop lr
+002b  c1c0          ret                             ; }
+====================================================== Output
+1
+A
+A
+
+========================================== Program statistics
+Input file name          =   c0904.a
+Instructions executed    =   29 (hex)    41 (dec)
+Program size             =   2c (hex)    44 (dec)
+Max stack size           =   5 (hex)    5 (dec)
+Load point               =   0 (hex)    0 (dec)
+
+
+++++++++++++++++++++++++++ c1001 ++++++++++++++++++++++++++
+
+
+LCC Assemble/Link/Interpret/Debug Ver 6.3  Tue Mar 24 14:31:58 2026
+Effendi, Kayin C
+
+Header
+o
+S     0023
+C
+
+Loc   Code           Source Code
+              .start main                  ; // c1001.c
+0000  f000    halt                         ; #include <stdio.h>
+0001  0014 n: .word 20                  ; int n = 20, z[] = { 100, 
+0002  0064 z: .word 100
+0003  0065    .word 101
+0004  0066    .word 102
+           g:                              ; void g(int a[])
+0005  ae00    push lr                      ; {
+0006  aa00    push fp
+0007  ab8c    mov fp, sp
+
+0008  6142    ldr r0, fp, 2                  ; a[1] = a[1] + 5; wai
+0009  6001    ldr r0, r0, 1
+000a  1025    add r0, r0, 5
+000b  6342    ldr r1, fp, 2 
+000c  7041    str r0, r1, 1
+
+000d  6142    ldr r0, fp, 2                 ; printf("%d\n", a[1]);
+000e  6001    ldr r0, r0, 1
+000f  f002    dout
+0010  f001    nl
+
+0011  ad4c    mov sp, fp
+0012  aa01    pop fp
+0013  ae01    pop lr  
+0014  c1c0    ret                          ; }
+           f:                              ; void f(int x)
+0015  ae00    push lr                     ; {
+0016  aa00    push fp
+0017  ab8c    mov fp, sp
+
+0018  d003    mov r0, 3                       ; x = x + 3;
+0019  6342    ldr r1, fp, 2
+001a  1001    add r0, r0, r1
+001b  7142    str r0, fp, 2
+
+001c  6142    ldr r0, fp, 2                     ; printf("%d\n", x)
+001d  f002    dout r0
+001e  f001    nl
+
+001f  ad4c    mov sp, fp
+0020  aa01    pop fp
+0021  ae01    pop lr  
+0022  c1c0    ret                          ; }
+           main:                           ; int main()
+0023  ae00    push lr                      ; {
+0024  aa00    push fp
+0025  ab8c    mov fp, sp
+
+0026  21da    ld r0, n                         ; f(n); // out: 23  
+0027  a000    push r0
+0028  4fec    bl f
+0029  1da1    add sp, sp, 1
+
+002a  e1d7    lea r0, z                        ; g(z); // out: 106
+002b  a000    push r0
+002c  4fd8    bl g
+002d  1da1    add sp, sp, 1
+
+002e  d000    mov r0, 0                        ; return 0;
+002f  ad4c    mov sp, fp
+0030  aa01    pop fp
+0031  ae01    pop lr  
+0032  c1c0    ret                          ; }
+====================================================== Output
+23
+106
+
+========================================== Program statistics
+Input file name       =      c1001.a
+Instructions executed =   2f (hex)    47 (dec)
+Program size          =   33 (hex)    51 (dec)
+Max stack size        =    5 (hex)     5 (dec)
+Load point            =    0 (hex)     0 (dec)
+
+
+++++++++++++++++++++++++++ c1002 ++++++++++++++++++++++++++
+
+
+LCC.js Assemble/Link/Interpret/Debug Ver 0.1  Tue, Mar 24, 2026, 14:50:50
+Effendi, Kayin C
+
+Header
+o
+S 002b
+C
+
+Loc   Code
+                       .start main                  ; // c1002.c
+0000  f000          halt                         ; #include <stdio.h>
+0001  0000       x: .word 0                     ; int x, a[10], b[10] = { 2, 3, 4 };
+0002  0000       a: .zero 10
+0003  0000      
+0004  0000      
+0005  0000      
+0006  0000      
+0007  0000      
+0008  0000      
+0009  0000      
+000a  0000      
+000b  0000      
+000c  0002       b: .word 2
+000d  0003          .word 3
+000e  0004          .word 4
+000f  ae00       f: push lr                      ; void f()
+0010  aa00          push fp                      ; {
+0011  ab8c          mov fp, sp
+                       
+0012  bdaa          sub sp, sp, 10                  ; int c[10];
+                    
+0013  d001          mov r0, 1                       ; a[x] = 1;
+0014  e3ed          lea r1, a
+0015  25eb          ld r2, x
+0016  1242          add r1, r1, r2
+0017  7040          str r0, r1, 0
+                       
+0018  d002          mov r0, 2                     ; b[x+1] = 2;
+0019  e3f2          lea r1, b
+001a  25e6          ld r2, x
+001b  14a1          add r2, r2, 1
+001c  1242          add r1, r1, r2
+001d  7040          str r0, r1, 0
+                       
+001e  d003          mov r0, 3                       ; c[x+2] = 3; c[10] so x+2 = -10 + (x+2)
+001f  1376          cea r1, -10 ; add r1, fp, -10
+0020  25e0          ld r2, x
+0021  14a2          add r2, r2, 2
+0022  1242          add r1, r1, r2
+0023  7040          str r0, r1, 0
+                       
+0024  6178          ldr r0, fp, -8                  ; printf("%d\n", c[2]); -10 + 2
+0025  f002          dout r0
+0026  f001          nl
+                       
+0027  ad4c          mov sp, fp
+0028  aa01          pop fp
+0029  ae01          pop lr
+002a  c1c0          ret                          ; }
+                    main:                           ; int main()
+002b  ae00          push lr                      ; {
+002c  aa00          push fp
+002d  ab8c          mov fp, sp
+                       
+002e  4fe0          bl f                            ; f();
+                       
+002f  e1d2          lea r0, a                       ; printf("%d %d\n", a[0], b[1]);
+0030  6000          ldr r0, r0, 0
+0031  f002          dout r0
+0032  d020          mov r0, ' '
+0033  f005          aout r0
+0034  e1d7          lea r0, b
+0035  6001          ldr r0, r0, 1
+0036  f002          dout r0
+0037  f001          nl
+                       
+0038  d000          mov r0, 0                     ; return 0;
+0039  ad4c          mov sp, fp
+003a  aa01          pop fp
+003b  ae01          pop lr
+003c  c1c0          ret                          ; }
+====================================================== Output
+3
+1 2
+
+========================================== Program statistics
+Input file name          =   c1002.a
+Instructions executed    =   2f (hex)    47 (dec)
+Program size             =   3d (hex)    61 (dec)
+Max stack size           =   e (hex)    14 (dec)
+Load point               =   0 (hex)    0 (dec)
+
+
+++++++++++++++++++++++++++ c1003 ++++++++++++++++++++++++++
+
+
+LCC.js Assemble/Link/Interpret/Debug Ver 0.1  Tue, Mar 24, 2026, 15:44:51
+Effendi, Kayin C
+
+Header
+o
+S 0024
+C
+
+Loc   Code
+                       .start main                  ; //c1003.c
+0000  f000          halt                        ; #include <stdio.h>
+0001  0000       a: .zero 5                      ; int a[5];
+0002  0000      
+0003  0000      
+0004  0000      
+0005  0000      
+0006  0000       @s0_c: .zero 5
+0007  0000      
+0008  0000      
+0009  0000      
+000a  0000      
+000b  ae00       f: push lr                      ; void f()
+000c  aa00          push fp                      ; {
+000d  ab8c          mov fp, sp
+                       
+000e  bda5          sub sp, sp, 5                   ; int b[5]; ; static int c[5];
+                       
+000f  d001          mov r0, 1                       ; a[0] = 1;
+0010  31f0          st r0, a  
+                       
+0011  d003          mov r0, 3                       ; b[1] = 3; @fp-4  {-5+1}
+0012  717c          str r0, fp -4
+                       
+0013  d016          mov r0, 22                      ; c[3] = 22;
+0014  31f4          st r0, @s0_c+3
+                       
+0015  d00c          mov r0, 12                      ; c[b[a[0]]] = 12; // problem child
+0016  23ea          ld r1, a ; == 1
+0017  157b          cea r2, -5
+0018  1242          add r1, r1, r2
+0019  6240          ldr r1, r1, 0 ; == 3
+001a  e5eb          lea r2, @s0_c
+001b  1242          add r1, r1, r2
+001c  7040          str r0, r1, 0 ; c[3] = 12
+                       
+001d  21eb          ld r0, @s0_c+3                ; printf("%d\n", c[3]);
+001e  f002          dout r0
+001f  f001          nl
+                       
+0020  ad4c          mov sp, fp
+0021  aa01          pop fp
+0022  ae01          pop lr
+0023  c1c0          ret                          ; }
+                    main:                           ; int main()
+0024  ae00          push lr                      ; {
+0025  aa00          push fp
+0026  ab8c          mov fp, sp
+                    
+0027  4fe3          bl f                            ; f();
+                    
+0028  d000          mov r0, 0                       ; return 0;
+0029  ad4c          mov sp, fp                   ; }
+002a  aa01          pop fp
+002b  ae01          pop lr
+002c  c1c0          ret
+====================================================== Output
+12
+
+========================================== Program statistics
+Input file name          =   c1003.a
+Instructions executed    =   23 (hex)    35 (dec)
+Program size             =   2d (hex)    45 (dec)
+Max stack size           =   9 (hex)    9 (dec)
+Load point               =   0 (hex)    0 (dec)

@@ -1,0 +1,64 @@
+   .start main                  ; // c0904.c
+   halt                         ; #include <stdio.h>
+B: .zero 1                      ; struct B
+                                ; {
+                                   ; char c;
+                                ; };
+A: .zero 1                     ; struct A 
+   .word B                      ; {
+                                   ; int x;
+                                   ; struct B y;
+                                ; };
+                                ; struct A s;
+f: push lr                      ; void f()
+   push fp                      ; {
+   mov fp, sp
+   
+   sub sp, sp, 1                   ; struct A *p;
+      
+   lea r0, A                       ; p = &s; @ fp-1
+   str r0, fp, -1
+      
+   mov r0, 1                       ; s.x = 1;
+   ldr r1, fp, -1
+   str r0, r1, 0
+      
+   mov r0, 'A'                     ; s.y.c = 'A';
+   ldr r1, fp, -1
+   ldr r1, r1, 1
+   str r0, r1, 0
+      
+   ldr r0, fp, -1                  ; printf("%d\n", p->x);
+   ldr r0, r0, 0
+   dout r0
+   nl
+
+   ldr r0, fp, -1                 ; printf("%c\n", (p->y).c);
+   ldr r0, r0, 1
+   ldr r0, r0, 0
+   aout r0
+   nl
+      
+   ldr r0, fp, -1                  ; printf("%c\n", (*p).y.c);
+   ldr r0, r0, 1
+   ldr r0, r0, 0
+   aout r0
+   nl
+
+   mov sp, fp
+   pop fp
+   pop lr
+   ret                          ; }
+main:                           ; int main()
+   push lr                     ; {
+   push fp
+   mov fp, sp
+   
+   bl f                            ; f();
+   
+   mov r0, 0                       ; return 0;
+   
+   mov sp, fp
+   pop fp
+   pop lr
+   ret                             ; }

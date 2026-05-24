@@ -1,0 +1,36 @@
+Kaylin Effendi // 21.04.26
+
+Question 2 (YOU DO NOT HAVE TO DO THE ENTIRE LINKING PROCESS MANUALLY LIKE IN QUESTION 1)
+
+= = = = 
+
+Link the above object files in the order of p1.o p3.o p2.o and run the generated link.e with the lcc. 
+
+How does the output of this program differ from the previous one? 
+
+-> It doesn't output 2. Instead of 123 it prints 13, because the ldr makes r0 load z (which is 3) twice before dout'ing.
+
+New line up of linked files:
+                                    p1.a ↓ 
+0000    x:            .word 2
+0001    startup:    ld r0, w     
+0002                dout r0
+                                    p3.a ↓ 
+0003    rec:        ld r0, u   
+0004                ldr r0, r0, 0 
+0005                ldr r0, r0, 0
+0006                dout r0
+0007                halt
+0008    u:           .word y  
+0009    w:           .word 1
+                                    p2.a ↓ 
+000a    main:       ld r0, x 
+000b                dout r0
+000c                bl rec   
+000d    y:           .word z  
+000e    z:           .word 3   
+
+
+Why do linking the same three files in a different order produce a different result here?
+
+-> In general linking them in different orders, changes the pcoffsets will be different than how it was linked in question 1. Instead of going from printing 1 from w then 2 from ld r0, x, it jumps straight to u and dout'ing 3 as that's the the new linking order puts ld r0, u before ld r0, x. Plus the halt in p3.a causes the program to never reach ld r0, x.

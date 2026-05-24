@@ -1,0 +1,40 @@
+; // c0405.c
+      .start main             ; #include <stdio.h>
+
+g:    push lr                 ; void g() { 
+      push fp
+      mov fp, sp
+      ldr r0, fp, 2           ;      printf("%d %d\n", x, y)
+      dout r0
+      lea r1, sp
+      sout r1
+      ldr r0, fp, 3
+      dout r0
+      nl        
+      mov sp, fp
+      pop fp
+      pop lr                              
+      ret                     ;  }
+sp: .string " "
+                                 
+f:    push lr                 ; void f(int x, int y)
+      push fp
+      mov fp, sp
+      ldr r0, fp 3            ;        g(x, y);
+      push r0
+      ldr r0, fp, 2           ; push in rev order
+      push r0
+      bl g
+      mov sp, fp
+      pop fp
+      pop lr                              
+      ret
+
+main: mov r0, 4               ; int main() { f()
+      push r0
+      mov r0, 3
+      push r0
+      bl f                    ;     f(3, 4);
+      add sp, sp, 2
+      halt                    ;     return 0; } 
+

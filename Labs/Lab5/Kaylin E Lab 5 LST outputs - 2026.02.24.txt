@@ -1,0 +1,356 @@
+++++++++++++++++++++++++++ c0401 ++++++++++++++++++++++++++
+
+
+LCC Assemble/Link/Interpret/Debug Ver 6.3  Tue Feb 24 16:37:58 2026
+Effendi, Kayin C
+
+Header
+o
+S     0017
+C
+
+Loc   Code           Source Code
+           ; // c0401.c
+                 .start main             ; #include <stdio.h>
+0000  ae00 g:    push lr                 ; void g() { ; printf("in 
+0001  aa00       push fp                 
+0002  ab8c       mov fp, sp
+0003  e005       lea r0, stm
+0004  f006       sout r0
+0005  ad4c       mov sp, fp
+0006  aa01       pop fp
+0007  ae01       pop lr
+0008  c1c0       ret
+0009  0069 stm: .string "in g\n"
+000a  006e
+000b  0020
+000c  0067
+000d  000a
+000e  0000
+
+000f  ae00 f:    push lr                 ; void f(void) { g(); }
+0010  aa00       push fp
+0011  ab8c       mov fp, sp
+0012  4fed       bl g
+0013  ad4c       mov sp, fp
+0014  aa01       pop fp
+0015  ae01       pop lr                              
+0016  c1c0       ret
+
+0017  4ff7 main: bl f                    ; int main() { f()
+0018  f000       halt                    ; return 0; }
+====================================================== Output
+in g
+
+========================================== Program statistics
+Input file name       =      c0401.a
+Instructions executed =   13 (hex)    19 (dec)
+Program size          =   19 (hex)    25 (dec)
+Max stack size        =    4 (hex)     4 (dec)
+Load point            =    0 (hex)     0 (dec)
+
+
+
+
+++++++++++++++++++++++++++ c0402 ++++++++++++++++++++++++++
+
+
+LCC Assemble/Link/Interpret/Debug Ver 6.3  Tue Feb 24 16:48:16 2026
+Effendi, Kayin C
+
+Header
+o
+S     0025
+C
+
+Loc   Code           Source Code
+           ; // c0402.c
+                 .start main             ; #include <stdio.h>
+
+0000  ae00 g:    push lr                 ; void g() { ; printf("in 
+0001  aa00       push fp                 
+0002  ab8c       mov fp, sp
+0003  e005       lea r0, stm
+0004  f006       sout r0
+0005  ad4c       mov sp, fp
+0006  aa01       pop fp
+0007  ae01       pop lr
+0008  c1c0       ret
+0009  0069 stm: .string "in g\n"
+000a  006e
+000b  0020
+000c  0067
+000d  000a
+000e  0000
+
+000f  ae00 f:    push lr                 ; void f(void) {
+0010  aa00       push fp
+0011  ab8c       mov fp, sp
+0012  e008       lea r0, up              ;     printf("up\n");
+0013  f006       sout r0
+0014  4feb       bl g                    ;     g();
+0015  e009       lea r0, down            ;     printf("down\n");
+0016  f006       sout r0
+0017  ad4c       mov sp, fp
+0018  aa01       pop fp
+0019  ae01       pop lr                              
+001a  c1c0       ret                     ;  }
+001b  0075 up:      .string "up\n"
+001c  0070
+001d  000a
+001e  0000
+001f  0064 down:    .string "down\n"
+0020  006f
+0021  0077
+0022  006e
+0023  000a
+0024  0000
+
+0025  e005 main: lea r0, msg1            ; int main() { 
+0026  f006       sout r0                 ;     printf("hello\n");
+0027  4fe7       bl f                    
+0028  e009       lea r0, msg2            ;     printf("goodbye\n");
+0029  f006       sout
+002a  f000       halt                    ;     return 0; } 
+002b  0068 msg1:    .string "hello\n"
+002c  0065
+002d  006c
+002e  006c
+002f  006f
+0030  000a
+0031  0000
+0032  0067 msg2:    .string "goodbye\n"
+0033  006f
+0034  006f
+0035  0064
+0036  0062
+0037  0079
+0038  0065
+0039  000a
+003a  0000
+====================================================== Output
+hello
+up
+in g
+down
+goodbye
+
+========================================== Program statistics
+Input file name       =      c0402.a
+Instructions executed =   1b (hex)    27 (dec)
+Program size          =   3b (hex)    59 (dec)
+Max stack size        =    4 (hex)     4 (dec)
+Load point            =    0 (hex)     0 (dec)
+
+
+
+
+++++++++++++++++++++++++++ c0403 ++++++++++++++++++++++++++
+
+
+LCC Assemble/Link/Interpret/Debug Ver 6.3  Tue Feb 24 17:07:47 2026
+Effendi, Kayin C
+
+Header
+o
+S     0016
+C
+
+Loc   Code           Source Code
+           ; // c0403.c
+                 .start main             ; #include <stdio.h>
+
+0000  ae00 f:    push lr                 ; void f(int x, int y, int
+0001  aa00       push fp
+0002  ab8c       mov fp, sp
+0003  6142       ldr r0, fp, 2           ;     printf("%d %d %d\n",
+0004  f002       dout r0
+0005  e20e       lea r1, sp
+0006  f206       sout r1
+0007  6143       ldr r0, fp, 3
+0008  f002       dout r0
+0009  e20a       lea r1, sp
+000a  f206       sout r1
+000b  6144       ldr r0, fp, 4
+000c  f002       dout r0
+000d  e206       lea r1, sp
+000e  f206       sout r1
+000f  f001       nl        
+0010  ad4c       mov sp, fp
+0011  aa01       pop fp
+0012  ae01       pop lr                              
+0013  c1c0       ret                     ;  }
+0014  0020 sp: .string " "
+0015  0000
+
+0016  d003 main: mov r0, 3               ; int main() { 
+0017  a000       push r0
+0018  d002       mov r0, 2
+0019  a000       push r0
+001a  d001       mov r0, 1
+001b  a000       push r0
+001c  4fe3       bl f                    ;     f(1, 2, 3);
+001d  1da3       add sp, sp, 3         ;  not sure if I need to fix
+001e  e002       lea r0, msg2            ;     printf("goodbye\n");
+001f  f006       sout
+0020  f000       halt                    ;     return 0; } 
+0021  0067 msg2:    .string "goodbye\n"
+0022  006f
+0023  006f
+0024  0064
+0025  0062
+0026  0079
+0027  0065
+0028  000a
+0029  0000
+====================================================== Output
+1 2 3 
+goodbye
+
+========================================== Program statistics
+Input file name       =      c0403.a
+Instructions executed =   1f (hex)    31 (dec)
+Program size          =   2a (hex)    42 (dec)
+Max stack size        =    5 (hex)     5 (dec)
+Load point            =    0 (hex)     0 (dec)
+
+
+
+
+++++++++++++++++++++++++++ c0404 ++++++++++++++++++++++++++
+
+
+LCC Assemble/Link/Interpret/Debug Ver 6.3  Tue Feb 24 18:00:59 2026
+Effendi, Kayin C
+
+Header
+o
+S     001a
+C
+
+Loc   Code           Source Code
+           ; // c0404.c
+                 .start main             ; #include <stdio.h>
+
+
+0000  ae00 f:    push lr                 ; void f(int x) 
+0001  aa00       push fp
+0002  ab8c       mov fp, sp
+
+0003  6142       ldr r0, fp, 2           ;     printf("%d\n", x);
+0004  6342       ldr r1, fp, 2
+0005  0800       brlt ls
+
+0006  f002 ls:   dout r0                 ;           printf("%d\n",
+0007  f001       nl        
+0008  b021       sub r0, r0, 1
+0009  7142       str r0, fp 2
+000a  8020       cmp r0, 0               ;            if (x > 0)
+000b  0001       brz gt
+000c  0ff9       br ls
+
+000d  6142 gt:   ldr r0, fp, 2 
+000e  1021       add r0, r0, 1
+000f  f002       dout r0                 ;           printf("%d\n",
+0010  f001       nl
+0011  7142       str r0, fp 2
+0012  8001       cmp r0, r1 
+0013  0001       brz *+2
+0014  03f8       brnz gt
+
+0015  f001       nl        
+0016  ad4c       mov sp, fp
+0017  aa01       pop fp
+0018  ae01       pop lr                              
+0019  c1c0       ret                     ;  }
+
+001a  d003 main: mov r0, 3               ; int main() { 
+001b  a000       push r0
+001c  4fe3       bl f                    ;     f(3);
+001d  f000       halt                    ;     return 0; } 
+
+
+
+====================================================== Output
+3
+2
+1
+1
+2
+3
+
+
+========================================== Program statistics
+Input file name       =      c0404.a
+Instructions executed =   3a (hex)    58 (dec)
+Program size          =   1e (hex)    30 (dec)
+Max stack size        =    3 (hex)     3 (dec)
+Load point            =    0 (hex)     0 (dec)
+
+
+
+
+++++++++++++++++++++++++++ c0405 ++++++++++++++++++++++++++
+
+
+LCC Assemble/Link/Interpret/Debug Ver 6.3  Tue Feb 24 18:16:38 2026
+Effendi, Kayin C
+
+Header
+o
+S     001c
+C
+
+Loc   Code           Source Code
+           ; // c0405.c
+                 .start main             ; #include <stdio.h>
+
+0000  ae00 g:    push lr                 ; void g() { 
+0001  aa00       push fp
+0002  ab8c       mov fp, sp
+0003  6142       ldr r0, fp, 2           ;      printf("%d %d\n", x
+0004  f002       dout r0
+0005  e208       lea r1, sp
+0006  f206       sout r1
+0007  6143       ldr r0, fp, 3
+0008  f002       dout r0
+0009  f001       nl        
+000a  ad4c       mov sp, fp
+000b  aa01       pop fp
+000c  ae01       pop lr                              
+000d  c1c0       ret                     ;  }
+000e  0020 sp: .string " "
+000f  0000
+
+0010  ae00 f:    push lr                 ; void f(int x, int y)
+0011  aa00       push fp
+0012  ab8c       mov fp, sp
+0013  6143       ldr r0, fp 3            ;        g(x, y);
+0014  a000       push r0
+0015  6142       ldr r0, fp, 2           ; push in rev order
+0016  a000       push r0
+0017  4fe8       bl g
+0018  ad4c       mov sp, fp
+0019  aa01       pop fp
+001a  ae01       pop lr                              
+001b  c1c0       ret
+
+001c  d004 main: mov r0, 4               ; int main() { f()
+001d  a000       push r0
+001e  d003       mov r0, 3
+001f  a000       push r0
+0020  4fef       bl f                    ;     f(3, 4);
+0021  1da2       add sp, sp, 2
+0022  f000       halt                    ;     return 0; } 
+
+====================================================== Output
+3 4
+
+========================================== Program statistics
+Input file name       =      c0405.a
+Instructions executed =   21 (hex)    33 (dec)
+Program size          =   23 (hex)    35 (dec)
+Max stack size        =    8 (hex)     8 (dec)
+Load point            =    0 (hex)     0 (dec)
+
+

@@ -1,0 +1,37 @@
+; // c0402.c
+      .start main             ; #include <stdio.h>
+
+g:    push lr                 ; void g() { ; printf("in g\n"); }
+      push fp                 
+      mov fp, sp
+      lea r0, stm
+      sout r0
+      mov sp, fp
+      pop fp
+      pop lr
+      ret
+stm: .string "in g\n"
+
+f:    push lr                 ; void f(void) {
+      push fp
+      mov fp, sp
+      lea r0, up              ;     printf("up\n");
+      sout r0
+      bl g                    ;     g();
+      lea r0, down            ;     printf("down\n");
+      sout r0
+      mov sp, fp
+      pop fp
+      pop lr                              
+      ret                     ;  }
+up:      .string "up\n"
+down:    .string "down\n"
+
+main: lea r0, msg1            ; int main() { 
+      sout r0                 ;     printf("hello\n");
+      bl f                    
+      lea r0, msg2            ;     printf("goodbye\n");
+      sout
+      halt                    ;     return 0; } 
+msg1:    .string "hello\n"
+msg2:    .string "goodbye\n"

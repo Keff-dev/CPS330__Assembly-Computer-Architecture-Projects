@@ -1,0 +1,64 @@
+   .start main                  ; // c1001.c
+   halt                         ; #include <stdio.h>
+n: .word 20                  ; int n = 20, z[] = { 100, 101, 102 };
+z: .word 100
+   .word 101
+   .word 102
+g:                              ; void g(int a[])
+   push lr                      ; {
+   push fp
+   mov fp, sp
+   
+   ldr r0, fp, 2                  ; a[1] = a[1] + 5; wait isn't that 0???
+   ldr r0, r0, 1
+   add r0, r0, 5
+   ldr r1, fp, 2 
+   str r0, r1, 1
+   
+   ldr r0, fp, 2                 ; printf("%d\n", a[1]);
+   ldr r0, r0, 1
+   dout
+   nl
+
+   mov sp, fp
+   pop fp
+   pop lr  
+   ret                          ; }
+f:                              ; void f(int x)
+   push lr                     ; {
+   push fp
+   mov fp, sp
+   
+   mov r0, 3                       ; x = x + 3;
+   ldr r1, fp, 2
+   add r0, r0, r1
+   str r0, fp, 2
+   
+   ldr r0, fp, 2                     ; printf("%d\n", x);
+   dout r0
+   nl
+   
+   mov sp, fp
+   pop fp
+   pop lr  
+   ret                          ; }
+main:                           ; int main()
+   push lr                      ; {
+   push fp
+   mov fp, sp
+   
+   ld r0, n                         ; f(n); // out: 23  (??)
+   push r0
+   bl f
+   add sp, sp, 1
+   
+   lea r0, z                        ; g(z); // out: 106
+   push r0
+   bl g
+   add sp, sp, 1
+
+   mov r0, 0                        ; return 0;
+   mov sp, fp
+   pop fp
+   pop lr  
+   ret                          ; }

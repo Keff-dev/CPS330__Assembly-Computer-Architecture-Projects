@@ -1,0 +1,20 @@
++++ LAB 9 PROBLEMS - 2026.03.24 +++
+
+Lab 9 15 Points
+Assigned: March 21, 2026
+Due: April 10, 2026
+
+
+Translate the following C programs into assembly as a non-optimizing compiler would:
+• c0902.c [done]
+• c0903.c [done]
+• c0904.c [done]
+• c1001.c [done]
+• c1002.c [done]
+• c1003.c [done]
+        - Hint: Remember the 4 steps to translate runtime indexing, and break
+        the problem into small steps. I recommend to start with finding the index of each
+        layer before taking the address of the array start.
+If you’d like to challenge yourself further, try these problems. They will not be graded:
+• Translate c0906.c
+• Translate c1008.c

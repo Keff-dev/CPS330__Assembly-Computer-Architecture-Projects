@@ -1,0 +1,63 @@
+   .start main                  ; // c1002.c
+   halt                         ; #include <stdio.h>
+x: .word 0                     ; int x, a[10], b[10] = { 2, 3, 4 };
+a: .zero 10
+b: .word 2
+   .word 3
+   .word 4
+f: push lr                      ; void f()
+   push fp                      ; {
+   mov fp, sp
+   
+   sub sp, sp, 10                  ; int c[10];
+
+   mov r0, 1                       ; a[x] = 1;
+   lea r1, a
+   ld r2, x
+   add r1, r1, r2
+   str r0, r1, 0
+   
+   mov r0, 2                     ; b[x+1] = 2;
+   lea r1, b
+   ld r2, x
+   add r2, r2, 1
+   add r1, r1, r2
+   str r0, r1, 0
+   
+   mov r0, 3                       ; c[x+2] = 3; c[10] so x+2 = -10 + (x+2)
+   cea r1, -10 ; add r1, fp, -10
+   ld r2, x
+   add r2, r2, 2
+   add r1, r1, r2
+   str r0, r1, 0
+   
+   ldr r0, fp, -8                  ; printf("%d\n", c[2]); -10 + 2
+   dout r0
+   nl
+   
+   mov sp, fp
+   pop fp
+   pop lr
+   ret                          ; }
+main:                           ; int main()
+   push lr                      ; {
+   push fp
+   mov fp, sp
+   
+   bl f                            ; f();
+   
+   lea r0, a                       ; printf("%d %d\n", a[0], b[1]);
+   ldr r0, r0, 0
+   dout r0
+   mov r0, ' '
+   aout r0
+   lea r0, b
+   ldr r0, r0, 1
+   dout r0
+   nl
+   
+   mov r0, 0                     ; return 0;
+   mov sp, fp
+   pop fp
+   pop lr
+   ret                          ; }

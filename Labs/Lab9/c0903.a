@@ -1,0 +1,58 @@
+   .start main                  ; // c0903.c
+   halt                         ; #include <stdio.h>
+A: .zero 2                      ; struct A 
+                                ; {
+                                   ; int x, y;
+                                ; };
+                                ; struct A s;
+f: push lr                      ; void f(struct A a, struct A *p)
+   push fp                      ; {
+   mov fp, sp
+   
+   ldr r0, fp, 4                   ; p->x = a.y;
+   ldr r1, fp, 2                   ; p->x means de-ref but a.y means grab/store on stack directly
+   str r0, r1, 1
+   
+   ldr r0, fp, 2                   ; a.y = p->x;
+   ldr r0, r0, 0
+   str r0, fp, 4
+   
+   ldr r0, fp, 3                   ; printf("%d\n", a.x);
+   dout r0
+   nl
+
+   ldr r0, fp, 2                   ; printf("%d\n", (*p).y);
+   ldr r0, r0, 1
+   dout r0
+   nl
+
+   mov sp, fp
+   pop fp
+   pop lr
+   ret                          ; }
+   
+main: push lr                   ; int main()
+      push fp                   ; {
+      mov fp, sp
+                                   ; struct A a;
+
+      mov r0, 1                    ; a.x = 1;
+      st r0, A
+
+      mov r0, 2                    ; a.y = 2;
+      st r0, A+1
+      
+      ld r0, A+1                   ; f(a, &a);
+      push r0
+      ld r0, A 
+      push r0
+      lea r0, A
+      push r0
+      bl f 
+      add sp, sp, 3
+
+      mov r0, 0                    ; return 0;
+      mov sp, fp
+      pop fp
+      pop lr
+      ret                       ; }
